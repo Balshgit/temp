@@ -1,0 +1,179 @@
+[tool.poetry]
+name = "sqlalchemy_study_project"
+version = "2.0.7"
+description = "for study sqlalchemy async models"
+authors = ["Dmitry Afanasyev <Balshbox@gmail.com>"]
+
+[build-system]
+requires = ["poetry-core>=1.8.2"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+SQLAlchemy = { version = "^2.0", extras = ["asyncio"] }
+SQLAlchemy-Utils = "^0.41"
+pydantic-settings = "^2.4"
+pydantic = { version = "2.8", extras = ["email"] }
+factory-boy = "^3.3"
+Faker = "^35"
+loguru = "^0.7"
+python-dotenv = "^1.0"
+asyncpg = "^0.28"
+psycopg2-binary = "^2.9"
+uvicorn = "^0.30"
+
+yarl = "^1.9"
+httpx = "0.27.0"
+
+[tool.poetry.dev-dependencies]
+yamllint = "^1.35"
+tomlkit = "^0.13"
+types-PyMySQL = "^1.1"
+types-python-dateutil = "^2.9"
+types-pytz = "^2024.1"
+respx = "^0.21"
+asgi-lifespan = "^2.1"
+
+factory-boy = "^3.3"
+Faker = "^35"
+
+pytest = "^8.3"
+pytest-asyncio = "^0.15.1" # > 0.15.1 provides unclosed connections and freezes in CI
+pytest-deadfixtures = "^2.2"
+pytest-mock = "^3.14"
+pytest-cov = "^5.0"
+pytest-sugar = "^1.0"
+pytest-clarity = "^1.0"
+pytest-fastapi-deps = "^0.2"
+pytest-timeouts = "^1.2"
+pytest-randomly = "^3.15"
+pytest-split = "^0.10.0"
+pytest-freezegun = "^0.4"
+pytest-celery = "^0.0.0" # version 1.0.0 provides timeout in celery tests
+pytest-socket = "^0.7"
+pytest-repeat = "^0.9"
+pytest-html = "^4.1"
+pytest-order = "^1.2"
+assertpy = "^1.1"
+
+mypy = "^1.11"
+black = "^24.8"
+
+Flake8-pyproject = "^1.2"
+flake8-aaa = "^0.17"
+flake8-variables-names = "^0.0.6"
+flake8-deprecated = "^2.2"
+flake8-noqa = "^1.4"
+flake8-annotations-complexity = "^0.0.8"
+flake8-useless-assert = "^0.4"
+flake8-warnings = "^0.4"
+flake8-newspaper-style = "^0.4"
+flake8-comments = "^0.1"
+flake8-jira-todo-checker = "^0.6"
+flake8-mock = "^0.4"
+ruff = "^0.6.0"
+
+
+[tool.ruff]
+lint.extend-select = ["F", "I", "PL", "E", "W", "C4", "PT", "B", "T10", "SIM", "TID", "T20", "PGH", "S", "RET", "ERA", "PIE", "UP", "ASYNC", "ISC", "PERF", "DTZ", "TRY", "C90"]
+lint.ignore = ["S105", "S106", "PGH003", "TRY003", "TRY004", "PT001", "PT023", "ASYNC109", "PLR0912"]
+line-length = 120
+output-format="concise"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "PLR2004", "PLR0913"]
+
+[tool.ruff.lint.pylint]
+max-args = 15
+
+[tool.ruff.lint.flake8-bugbear]
+# Allow default arguments like, e.g., `data: List[str] = fastapi.Query(None)`.
+extend-immutable-calls = [
+    "fastapi.Depends", "fastapi.Query", "fastapi.Body", "fastapi.File", "fastapi.Cookie", "fastapi.HTTPBearer",
+    "fastapi.Header", "fastapi.Security", "fastapi.Path", "fastapi.Form"
+]
+
+[tool.ruff.lint.flake8-pytest-style]
+parametrize-names-type = "csv"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ruff.lint.isort]
+force-wrap-aliases = true
+combine-as-imports = true
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "double"
+
+[tool.flake8]
+inline-quotes = "double"
+max-line-length = 120
+max-expression-complexity = 10
+max-annotations-complexity=4
+max-complexity = 15
+jira-project-ids = ["DEV", "TECHN", "PAY", "NAV", "ACQN", "EPIC", "RX"]
+ban-relative-imports = true
+nested-classes-whitelist = ["Config", "Meta"]
+pytest-parametrize-names-type = "csv"
+extend-ignore = [
+    "E902",
+    "VNE003",
+    "NQA102",
+    "NQA103"
+]
+exclude = [
+    ".venv/*",
+    ".cache/*",
+    ".pytest_cache/*",
+    "*/__pycache__/*",
+]
+per-file-ignores = []
+
+[tool.black]
+line-length = 120
+target-version = ['py312']
+
+[tool.coverage.run]
+relative_files = true
+concurrency = ["greenlet", "thread"]
+
+[tool.coverage.report]
+sort = "cover"
+skip_covered = true
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::pytest.PytestUnraisableExceptionWarning",
+]
+
+
+[tool.mypy]
+# Mypy configuration:
+# https://mypy.readthedocs.io/en/latest/config_file.html
+allow_redefinition = false
+namespace_packages = true
+check_untyped_defs = true
+disallow_untyped_decorators = false
+disallow_any_explicit = false
+disallow_any_generics = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+ignore_errors = false
+ignore_missing_imports = true
+implicit_reexport = false
+local_partial_types = true
+strict_optional = true
+strict_equality = true
+show_error_codes = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unreachable = true
+warn_no_return = true
+exclude = [
+    ".venv",
+    "tests/integration/*",
+    "tests/unit/*",
+]
