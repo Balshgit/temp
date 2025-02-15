@@ -1,5 +1,5 @@
-from sqlalchemy import Table, inspect
-from sqlalchemy.orm import DeclarativeBase, declared_attr
+from sqlalchemy import inspect
+from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
@@ -10,16 +10,9 @@ class Base(DeclarativeBase):
     enhance autocompletion.
     """
 
-    # Generate __tablename__ automatically
-    @declared_attr
-    def __tablename__(self) -> str:
-        return self.__name__.lower()
-
-    __table__: Table
-
     @classmethod
     def get_real_column_name(cls, attr_name: str) -> str:
-        return getattr(inspect(cls).c, attr_name).name  # type: ignore
+        return getattr(inspect(cls).c, attr_name).name
 
     def __str__(self) -> str:
         return self.__repr__()

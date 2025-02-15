@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
+from dependency_injector.wiring import inject
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.exc import NoResultFound
 from starlette import status
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
-from app.api.users.deps import get_user_service, request_verification
-from app.api.users.serializers import UserSerializer, DetailedUserSerializer
+from app.api.users.deps import request_verification
+from app.api.users.serializers import DetailedUserSerializer, UpdateUserSerializer, UserSerializer
+from app.core.users.dto import UpdateUserRequestDTO
 from app.core.users.services import UserService
+from app.di.app_dependency_injector import AsyncProvide, DIContainer
 
 router = APIRouter()
 
@@ -19,7 +22,10 @@ router = APIRouter()
     dependencies=[Depends(request_verification)],
     summary="Получение всех пользователей",
 )
-async def get_users(user_service: UserService = Depends(get_user_service)) -> JSONResponse:
+@inject
+async def get_users(
+    user_service: UserService = Depends(AsyncProvide[DIContainer.services.user_service]),
+) -> JSONResponse:
     """Получить список всех пользователей"""
     users = await user_service.get_all_users()
 
@@ -37,9 +43,10 @@ async def get_users(user_service: UserService = Depends(get_user_service)) -> JS
     dependencies=[Depends(request_verification)],
     summary="Получение всех пользователей",
 )
-async def get_users(
+@inject
+async def get_all_users(
     user_id: int,
-    user_service: UserService = Depends(get_user_service)
+    user_service: UserService = Depends(AsyncProvide[DIContainer.services.user_service]),
 ) -> JSONResponse:
     """Получить список всех пользователей"""
 
@@ -52,3 +59,23 @@ async def get_users(
         status_code=status.HTTP_200_OK,
         content=DetailedUserSerializer.model_validate(user).model_dump(),
     )
+
+
+@router.put(
+    "/users/{user_id}",
+    name="users:get_users",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    dependencies=[Depends(request_verification)],
+    summary="Изменение данных пользователя",
+)
+@inject
+async def update_user_info(
+    user_id: int,
+    user_data: UpdateUserSerializer = Body(...),
+    user_service: UserService = Depends(AsyncProvide[DIContainer.services.user_service]),
+) -> None:
+    """Изменить данные пользователя"""
+
+    user_data = UpdateUserRequestDTO(**user_data.model_dump())
+    await user_service.update_user_info(user_data=user_data, user_id=user_id)

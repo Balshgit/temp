@@ -5,6 +5,7 @@ import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
 from loguru import logger
+from redis.asyncio import Redis
 from sqlalchemy import URL, create_engine
 from sqlalchemy.ext.declarative import ConcreteBase
 from sqlalchemy.orm import Session, scoped_session
@@ -75,6 +76,26 @@ async def user_client(
         yield client
 
 
+@pytest.fixture(autouse=True)
+async def redis_client(fastapi_app: FastAPI) -> AsyncGenerator[Redis, None]:
+    redis: Redis = await fastapi_app.state.container.adapters.redis_client()
+    await redis.flushdb()
+    yield redis
+    await redis.flushdb()
+
+
+@pytest.fixture(scope="session")
+def sync_session(request: pytest.FixtureRequest, test_settings: AppSettings) -> scoped_session:
+    return _sync_session(
+        request=request,
+        db_sync_dsn=test_settings.sync_db_url,
+        db_schema_name=test_settings.POSTGRES_DB,
+        db_host=test_settings.DB_HOST,
+        db_base=Base,
+        session=database.sync_session,
+    )
+
+
 def _sync_session(
     request: pytest.FixtureRequest,
     db_sync_dsn: URL,
@@ -88,7 +109,7 @@ def _sync_session(
     2. Создаем Engine, в котором хранится connection pool для доступа к этой базе
     3. Создаем все таблицы, которые в базе должны храниться (множество таблиц берется из metadata объекта ConcreteBase)
     3. На всю pytest сессию создается 1 connection к базе.
-    4. Прикрепляем созданную ранее 1 сессию алхимии (см factories.DBLSession например) к коннекшну из пункта 3
+    4. Прикрепляем созданную ранее 1 сессию алхимии (см tests/utils.py например) к коннекшну из пункта 3
     5. Прикрепляем созданную ранее 1 сессию алхимии к FactoryBoy -
        Теперь все фабрики FactoryBoy при создании будут использовать одну и ту же сессию в рамках одной базы
     6. После прогона каждого теста чистим все таблицы, которые изменили в рамках теста (см _clear_tables)
@@ -160,18 +181,6 @@ def _sync_db(sync_session: Session, db_schema_name: str, db_host: str, db_base: 
         yield sync_session
     finally:
         _clear_tables(sync_session, db_base)
-
-
-@pytest.fixture(scope="session")
-def sync_session(request: pytest.FixtureRequest, test_settings: AppSettings) -> scoped_session:
-    return _sync_session(
-        request=request,
-        db_sync_dsn=test_settings.sync_db_url,
-        db_schema_name=test_settings.POSTGRES_DB,
-        db_host=test_settings.DB_HOST,
-        db_base=Base,
-        session=database.sync_session,
-    )
 
 
 @pytest.fixture()

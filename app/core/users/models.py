@@ -7,7 +7,7 @@ from app.infra.database.base import Base
 
 
 class User(Base):
-    __tablename__ = "users"  # type: ignore[assignment]
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(INTEGER, primary_key=True)
     email: Mapped[str] = mapped_column(VARCHAR(length=255), unique=True, nullable=True)

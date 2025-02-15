@@ -94,4 +94,4 @@ def configure_logging(*, level: LogLevelEnum, enable_json_logs: bool) -> None:
     ]
 
     logging.basicConfig(handlers=base_config_handlers, level=level.name)
-    logger.configure(handlers=loguru_handlers)
+    logger.configure(handlers=loguru_handlers)  # type: ignore[arg-type]

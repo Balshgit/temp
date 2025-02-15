@@ -1,3 +1,4 @@
+import asyncio
 import os
 import pkgutil
 from asyncio import current_task
@@ -55,7 +56,7 @@ class Database:
         return self._async_engine
 
     @property
-    def sync_session(self) -> ScopedSession:
+    def sync_session(self) -> ScopedSession[Session]:
         return self._sync_session_factory
 
     @asynccontextmanager
@@ -77,6 +78,11 @@ class Database:
             except Exception:
                 await session.rollback()
                 raise
+
+    async def disconnect(self) -> None:
+        await asyncio.gather(self._async_session_factory.close(), self._async_engine.dispose())
+        self._sync_engine.dispose()
+        self._sync_session_factory.close()
 
 
 def load_all_models() -> None:

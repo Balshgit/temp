@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.infra.database.db_adapter import Database
+from app.di.app_dependency_injector import DIContainer
 from app.infra.logging import configure_logging
 from app.routes import api_router
 from settings.config import AppSettings, load_app_settings
@@ -14,15 +14,18 @@ class Application:
             debug=settings.DEBUG,
         )
         self.app.state.settings = settings
-        self.app.state.database = Database(settings=settings)
         self.settings = settings
-
         self.app.include_router(api_router)
+        self.create_di_container()
 
         configure_logging(
             level=settings.LOG_LEVEL,
             enable_json_logs=settings.ENABLE_JSON_LOGS,
         )
+
+    def create_di_container(self) -> None:
+        container = DIContainer()
+        self.app.state.container = container
 
     @property
     def fastapi_app(self) -> FastAPI:

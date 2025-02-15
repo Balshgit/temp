@@ -1,20 +1,20 @@
-import os
-
 import factory
-from dotenv import load_dotenv
 
 from app.infra.database.db_adapter import Database
-from settings.config import AppSettings, load_app_settings
+from settings.config import load_app_settings
 
 
-def load_settings() -> AppSettings:
-    is_local_test = os.getenv("LOCALTEST", "False").lower() in ("true", "1", "t")
-    test_environment_path = "settings/environments/.env.local.runtests" if is_local_test else None
-    load_dotenv(test_environment_path, override=is_local_test)
-    return load_app_settings()
+class RaiseError(Exception):
+    """Custom exception to raise from mocked (override) dependencies."""
+
+    def __init__(self, message: str | None = None):
+        self._message = message or "raise error"
+
+    def __str__(self) -> str:
+        return str(self._message)
 
 
-database = Database(load_settings())
+database = Database(load_app_settings())
 
 
 class BaseModelFactory(factory.alchemy.SQLAlchemyModelFactory):
