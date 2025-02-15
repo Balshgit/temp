@@ -13,6 +13,6 @@ class UserRepository:
     async def get_all_users(self) -> list[User]:
         query = select(User)
 
-        async with self.db.session as session:
+        async with self.db.session() as session:
             result = await session.execute(query)
             return result.scalars().all()

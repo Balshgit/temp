@@ -4,7 +4,7 @@ import factory
 from dotenv import load_dotenv
 
 from app.infra.database.db_adapter import Database
-from settings.config import load_app_settings, AppSettings
+from settings.config import AppSettings, load_app_settings
 
 
 def load_settings() -> AppSettings:

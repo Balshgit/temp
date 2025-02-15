@@ -1,5 +1,5 @@
 from sqlalchemy import Table, inspect
-from sqlalchemy.orm import declared_attr, DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, declared_attr
 
 
 class Base(DeclarativeBase):

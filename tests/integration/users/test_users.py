@@ -1,15 +1,14 @@
 import pytest
 from httpx import AsyncClient
-
 from sqlalchemy.orm import Session
 
 from settings.config import AppSettings
 from tests.integration.factories.users import UserFactory
 
-
 pytestmark = [
     pytest.mark.asyncio,
 ]
+
 
 async def test_get_chatgpt_models(
     sync_db: Session,
@@ -21,4 +20,11 @@ async def test_get_chatgpt_models(
     response = await rest_client.get("/api/users")
     assert response.status_code == 200
 
-    assert response.json() == {}
+    data = response.json()
+    data = sorted(data, key=lambda u: u["id"])
+
+    assert data == {
+        [
+            "id":
+        ]
+    }

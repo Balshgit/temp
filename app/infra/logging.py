@@ -93,7 +93,5 @@ def configure_logging(*, level: LogLevelEnum, enable_json_logs: bool) -> None:
         {**base_loguru_handler, "colorize": True, "sink": sys.stdout},
     ]
 
-
     logging.basicConfig(handlers=base_config_handlers, level=level.name)
     logger.configure(handlers=loguru_handlers)
-

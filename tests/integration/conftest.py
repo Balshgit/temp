@@ -1,5 +1,4 @@
 import asyncio
-import os
 from typing import AsyncGenerator
 
 import pytest
@@ -9,7 +8,7 @@ from loguru import logger
 from sqlalchemy import URL, create_engine
 from sqlalchemy.ext.declarative import ConcreteBase
 from sqlalchemy.orm import Session, scoped_session
-from sqlalchemy_utils import database_exists, drop_database, create_database
+from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from app.infra.database.base import Base
 from app.main import Application
@@ -40,7 +39,6 @@ def event_loop() -> asyncio.AbstractEventLoop:
 @pytest.fixture(scope="session")
 def test_application(
     test_settings: AppSettings,
-
 ) -> Application:
     return Application(settings=test_settings)
 
