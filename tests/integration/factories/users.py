@@ -15,6 +15,7 @@ class UserFactory(BaseModelFactory):
     is_active = True
     is_superuser = False
     created_at = factory.Faker("past_datetime")
+    password = factory.Faker("password")
 
     class Meta:
         model = User

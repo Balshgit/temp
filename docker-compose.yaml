@@ -3,6 +3,8 @@ version: "3.9"
 volumes:
   sqlalchemy_study_db_data:
     name: "sqlalchemy_study_db_data"
+  redis_data:
+    name: "redis_data"
 
 services:
 
@@ -19,3 +21,21 @@ services:
     ports:
       - '5433:5433'
     command: -p 5433
+
+  dragonfly: # the new redis
+    build:
+      context: .
+      dockerfile: docker/dragonfly/Dockerfile
+    ulimits:
+      memlock: -1
+    environment:
+      - REDIS_PASSWORD=password
+      - REDIS_DATABASE=backup.rdb
+
+      # save for every 1 minute
+      - REDIS_BACKUP_DB=*:*
+    ports:
+      - '6379:6379'
+    volumes:
+      - "redis_data:/data"
+    restart: unless-stopped

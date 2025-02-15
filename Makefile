@@ -5,7 +5,7 @@ YELLOW := $(shell tput -Txterm setaf 3)
 RESET  := $(shell tput -Txterm sgr0)
 
 .DEFAULT_GOAL := help
-.PHONY: help app format lint check-style check-import-sorting lint-typing lint-imports lint-complexity lint-deps
+.PHONY: help app format lint check-style check-import-sorting lint-typing lint-imports lint-complexity lint-deps up-dependencies down-dependencies
 
 PYTHON_TARGETS = app tests
 PORT=8000
@@ -14,9 +14,11 @@ PORT=8000
 app:
 	poetry run uvicorn --host 0.0.0.0 --factory app.main:create_app --port $(PORT) --reload --reload-dir=bot_microservice --reload-dir=settings
 
+## Запустить зависимости
 up-dependencies:
 	docker compose up -d
 
+## Остановить зависимости
 down-dependencies:
 	docker compose down -v
 

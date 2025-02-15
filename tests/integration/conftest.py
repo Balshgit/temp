@@ -62,6 +62,19 @@ async def rest_client(
         yield client
 
 
+@pytest.fixture()
+async def user_client(
+    fastapi_app: FastAPI,
+    test_settings: AppSettings,
+) -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(
+        app=fastapi_app,
+        base_url="http://test",
+        headers={"Content-Type": "application/json", "USER-API-KEY": test_settings.USER_KEY_HEADER.get_secret_value()},
+    ) as client:
+        yield client
+
+
 def _sync_session(
     request: pytest.FixtureRequest,
     db_sync_dsn: URL,

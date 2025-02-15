@@ -2,6 +2,7 @@ import os
 from functools import lru_cache, cached_property
 
 from dotenv import load_dotenv
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import URL
 
@@ -12,6 +13,7 @@ class BaseAppSettings(BaseSettings):
     STAGE: StageEnum
     LOG_LEVEL: LogLevelEnum
     ENABLE_JSON_LOGS: bool
+    LOCALTEST: bool
     model_config = SettingsConfigDict(env_file="settings/environments/.env", extra="ignore")
 
 
@@ -21,14 +23,17 @@ class DataBaseSettings(BaseSettings):
     POSTGRES_USER: str = "user"
     POSTGRES_PASSWORD: str = "postgrespwd"
     DB_ECHO: bool
+    DB_HOST: str
 
 
-class AppSettings(BaseAppSettings, DataBaseSettings, BaseSettings):
+class UsersSettings(BaseSettings):
+    USER_KEY_HEADER: SecretStr
+
+
+class AppSettings(BaseAppSettings, DataBaseSettings, UsersSettings, BaseSettings):
     DEBUG: bool
     APP_HOST: str
     APP_PORT: int
-    LOCALTEST: bool
-    DB_HOST: str
 
     @cached_property
     def async_db_url(self) -> URL:
@@ -58,7 +63,7 @@ class AppSettings(BaseAppSettings, DataBaseSettings, BaseSettings):
 
 @lru_cache(maxsize=None)  # noqa: UP033
 def load_app_settings() -> AppSettings:
-    is_local_test = os.getenv("LOCALTEST", "False").lower() in ("true", "1", "t")
+    is_local_test = os.getenv("LOCALTEST", "False").lower() in ("true", "1", "t") or BaseAppSettings
     app_env = StageEnum.runtests if is_local_test else BaseAppSettings().STAGE
     environment_path = "settings/environments/.env"
     if app_env is StageEnum.runtests and is_local_test:
